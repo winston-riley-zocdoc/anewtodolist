@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class TheNextGoogleApplication {
+public class NewTodoListApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(TheNextGoogleApplication.class, args);
+		SpringApplication.run(NewTodoListApplication.class, args);
 	}
 
 }
