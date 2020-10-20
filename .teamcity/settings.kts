@@ -29,12 +29,18 @@ version = "2020.1"
 project {
 
     buildType(Build)
-    buildType(Test)
+    buildType(SlowTest)
+    buildType(FastTest)
     buildType(Package)
 
     sequential {
         buildType(Build)
-        buildType(Test)
+
+        parallel {
+            buildType(SlowTest)
+            buildType(FastTest)
+
+        }
         buildType(Package)
     }
 }
@@ -56,8 +62,8 @@ object Build : BuildType({
 
 })
 
-object Test : BuildType({
-    name = "Test"
+object SlowTest : BuildType({
+    name = "Slow Test"
 
     vcs {
         root(DslContext.settingsRoot)
@@ -67,10 +73,28 @@ object Test : BuildType({
 
         maven {
             goals = "clean test"
-            runnerArgs = "-Dmaven.test.failure.ignore=true"
+            runnerArgs = "-Dmaven.test.failure.ignore=true -Dtest=*.integration.*Test"
         }
     }
 })
+
+
+object FastTest : BuildType({
+    name = "Fast Test"
+
+    vcs {
+        root(DslContext.settingsRoot)
+    }
+
+    steps {
+
+        maven {
+            goals = "clean test"
+            runnerArgs = "-Dmaven.test.failure.ignore=true -Dtest=*.unit.*Test"
+        }
+    }
+})
+
 
 object Package : BuildType({
     name = "Package"
