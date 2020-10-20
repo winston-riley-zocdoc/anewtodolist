@@ -29,6 +29,14 @@ version = "2020.1"
 project {
 
     buildType(Build)
+    buildType(Test)
+    buildType(Package)
+
+    sequential {
+        buildType(Build)
+        buildType(Test)
+        buildType(Package)
+    }
 }
 
 object Build : BuildType({
@@ -40,10 +48,50 @@ object Build : BuildType({
 
     steps {
 
-        val goal = "test"
+        maven {
+            goals = "clean compile"
+            runnerArgs = "-Dmaven.test.failure.ignore=true"
+        }
+    }
+
+    triggers {
+        vcs {
+        }
+    }
+})
+
+object Test : BuildType({
+    name = "Test"
+
+    vcs {
+        root(DslContext.settingsRoot)
+    }
+
+    steps {
 
         maven {
-            goals = goal
+            goals = "clean compile"
+            runnerArgs = "-Dmaven.test.failure.ignore=true"
+        }
+    }
+
+    triggers {
+        vcs {
+        }
+    }
+})
+
+object Package : BuildType({
+    name = "Package"
+
+    vcs {
+        root(DslContext.settingsRoot)
+    }
+
+    steps {
+
+        maven {
+            goals = "clean package"
             runnerArgs = "-Dmaven.test.failure.ignore=true"
         }
     }
