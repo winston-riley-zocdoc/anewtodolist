@@ -54,10 +54,6 @@ object Build : BuildType({
         }
     }
 
-    triggers {
-        vcs {
-        }
-    }
 })
 
 object Test : BuildType({
@@ -70,13 +66,8 @@ object Test : BuildType({
     steps {
 
         maven {
-            goals = "clean compile"
+            goals = "clean test"
             runnerArgs = "-Dmaven.test.failure.ignore=true"
-        }
-    }
-
-    triggers {
-        vcs {
         }
     }
 })
