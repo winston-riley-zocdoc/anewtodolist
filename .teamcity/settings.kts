@@ -28,12 +28,7 @@ version = "2020.1"
 
 project {
 
-    buildType(Build)
-    buildType(SlowTest)
-    buildType(FastTest)
-    buildType(Package)
-
-    sequential {
+    val chain = sequential {
         buildType(Build)
 
         parallel {
@@ -43,6 +38,7 @@ project {
         }
         buildType(Package)
     }
+    chain.buildTypes().forEach { buildType(it) }
 }
 
 object Build : BuildType({
