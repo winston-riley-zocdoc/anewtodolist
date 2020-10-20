@@ -54,7 +54,7 @@ project {
 }
 
 class Maven(name: String, goals: String, runnerArgs: String = ""): BuildType({
-    id("Anewtodolist_${name}".toExtId())
+    id(name.toExtId())
     this.name = name
 
     vcs {
