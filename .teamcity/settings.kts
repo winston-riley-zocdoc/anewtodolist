@@ -2,6 +2,7 @@ import jetbrains.buildServer.configs.kotlin.v10.toExtId
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.maven
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
+import jetbrains.buildServer.configs.kotlin.v2019_2.vcs.GitVcsRoot
 
 /*
 The settings script is an entry point for defining a TeamCity
@@ -29,6 +30,12 @@ version = "2020.1"
 
 project {
 
+    vcsRoot(MyGitRepo)
+
+    params {
+        password("git-password", "credentialsJSON:9b2z13a9-4ce5-431b-b5c5-cb67fc007bf4")
+    }
+
     val chain = sequential {
         buildType(Maven("Build", "clean compile"))
 
@@ -52,6 +59,14 @@ project {
         }
     }
 }
+
+object MyGitRepo : GitVcsRoot( {
+    url = "https://www.got.com"
+    authMethod = password {
+        userName =  "Hello"
+        password = "credentialsJSON:9b2z13a9-4ce5-431b-b5c5-cb67fc007bf4"
+    }
+})
 
 class Maven(name: String, goals: String, runnerArgs: String = ""): BuildType({
     id(name.toExtId())
