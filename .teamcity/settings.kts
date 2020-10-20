@@ -61,6 +61,7 @@ project {
 }
 
 object MyGitRepo : GitVcsRoot( {
+    name = "huhu"
     url = "https://www.got.com"
     authMethod = password {
         userName =  "Hello"
