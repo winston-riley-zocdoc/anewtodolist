@@ -29,18 +29,6 @@ version = "2020.1"
 project {
 
     buildType(Build)
-    buildType(Package)
-    buildType(SlowTest)
-    buildType(FastTest)
-
-    sequential {
-        buildType(Build)
-        parallel {
-            buildType(SlowTest)
-            buildType(FastTest)
-        }
-        buildType(Package)
-    }
 }
 
 object Build : BuildType({
@@ -57,57 +45,6 @@ object Build : BuildType({
             runnerArgs = "-Dmaven.test.failure.ignore=true"
         }
     }
-})
-
-object SlowTest : BuildType({
-    name = "SlowTest"
-
-    vcs {
-        root(DslContext.settingsRoot)
-    }
-
-    steps {
-        maven {
-            goals = "clean test"
-            runnerArgs = "-Dmaven.test.failure.ignore=true -Dtest=*.integration.*Test"
-        }
-    }
-})
-
-object FastTest : BuildType({
-    name = "FastTest"
-
-    vcs {
-        root(DslContext.settingsRoot)
-    }
-
-    steps {
-        maven {
-            goals = "clean test"
-            runnerArgs = "-Dmaven.test.failure.ignore=true -Dtest=*.unit.*Test"
-        }
-    }
-})
-
-
-
-object Package : BuildType({
-    name = "Package"
-
-    vcs {
-        root(DslContext.settingsRoot)
-    }
-
-    steps {
-        maven {
-            goals = "clean package"
-            runnerArgs = "-Dmaven.test.failure.ignore=true"
-        }
-    }
-
-//    dependencies {
-//        snapshot(Build) {}
-//    }
 
     triggers {
         vcs {
