@@ -30,9 +30,15 @@ project {
 
     buildType(Build)
     buildType(Package)
+    buildType(SlowTest)
+    buildType(FastTest)
 
     sequential {
         buildType(Build)
+        parallel {
+            buildType(SlowTest)
+            buildType(FastTest)
+        }
         buildType(Package)
     }
 }
@@ -52,6 +58,38 @@ object Build : BuildType({
         }
     }
 })
+
+object SlowTest : BuildType({
+    name = "SlowTest"
+
+    vcs {
+        root(DslContext.settingsRoot)
+    }
+
+    steps {
+        maven {
+            goals = "clean test"
+            runnerArgs = "-Dmaven.test.failure.ignore=true -Dtest=*.integration.*Test"
+        }
+    }
+})
+
+object FastTest : BuildType({
+    name = "FastTest"
+
+    vcs {
+        root(DslContext.settingsRoot)
+    }
+
+    steps {
+        maven {
+            goals = "clean test"
+            runnerArgs = "-Dmaven.test.failure.ignore=true -Dtest=*.unit.*Test"
+        }
+    }
+})
+
+
 
 object Package : BuildType({
     name = "Package"
