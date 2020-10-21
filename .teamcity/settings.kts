@@ -1,6 +1,9 @@
-import jetbrains.buildServer.configs.kotlin.v2019_2.*
+import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
+import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.maven
+import jetbrains.buildServer.configs.kotlin.v2019_2.project
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
+import jetbrains.buildServer.configs.kotlin.v2019_2.version
 
 /*
 The settings script is an entry point for defining a TeamCity
@@ -40,6 +43,7 @@ object Build : BuildType({
 
     steps {
         maven {
+            name = "my custom maven build step name"
             goals = "clean test"
             runnerArgs = "-Dmaven.test.failure.ignore=true"
         }
