@@ -28,23 +28,29 @@ version = "2020.1"
 
 project {
 
-    buildType(Build)
-    buildType(FastTest)
-    buildType(SlowTest)
-    buildType(Package)
-
-    sequential {
-        buildType(Build)
+    val chain = sequential {
+        buildType(Maven("Build", "clean compile"))
         parallel {
-            buildType(FastTest)
-            buildType(SlowTest)
+            buildType(Maven("Fast Test", "clean test", "-Dmaven.test.failure.ignore=true -Dtest=*.unit.*Test"))
+            buildType(Maven("Slow Test", "clean test", "-Dmaven.test.failure.ignore=true -Dtest=*.integration.*Test"))
         }
-        buildType(Package)
+        buildType(Maven("Package", "clean package"))
+    }
+
+    chain.buildTypes().forEach {
+        run {
+            buildType(it)
+            if (it == chain.buildTypes().last()) {
+                it.triggers {
+                    vcs {}
+                }
+            }
+        }
     }
 }
 
-object Build : BuildType({
-    name = "Build"
+class Maven(name: String, goals: String, runnerArgs : String = ""): BuildType( {
+    this.name = name
 
     vcs {
         root(DslContext.settingsRoot)
@@ -52,64 +58,8 @@ object Build : BuildType({
 
     steps {
         maven {
-            goals = "clean compile"
-            runnerArgs = "-Dmaven.test.failure.ignore=true"
-        }
-    }
-})
-
-object FastTest : BuildType({
-    name = "Fast Test"
-
-    vcs {
-        root(DslContext.settingsRoot)
-    }
-
-    steps {
-        maven {
-            goals = "clean test"
-            runnerArgs = "-Dmaven.test.failure.ignore=true -Dtest=*.unit.*Test"
-        }
-    }
-})
-
-object SlowTest : BuildType({
-    name = "Slow Test"
-
-    vcs {
-        root(DslContext.settingsRoot)
-    }
-
-    steps {
-        maven {
-            goals = "clean test"
-            runnerArgs = "-Dmaven.test.failure.ignore=true -Dtest=*.integration.*Test"
-        }
-    }
-})
-
-
-
-object Package : BuildType({
-    name = "Package"
-
-    vcs {
-        root(DslContext.settingsRoot)
-    }
-
-    steps {
-        maven {
-            goals = "clean package"
-            runnerArgs = "-Dmaven.test.failure.ignore=true"
-        }
-    }
-
-//    dependencies {
-//        snapshot(Build) {}
-//    }
-//
-    triggers {
-        vcs {
+            this.goals = goals
+            this.runnerArgs = runnerArgs
         }
     }
 })
