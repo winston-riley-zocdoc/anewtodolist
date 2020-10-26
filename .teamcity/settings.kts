@@ -54,7 +54,7 @@ project {
 
 object GitRepo: GitVcsRoot({
     name = DslContext.getParameter("gitName")
-    branchSpec = DslContext.getParameter("gitBranchSpec","+:*")
+    branch = DslContext.getParameter("gitBranchSpec","+:refs/heads/main")
     url = DslContext.getParameter("gitUrl")
 })
 
