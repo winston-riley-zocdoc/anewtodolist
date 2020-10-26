@@ -2,6 +2,7 @@ import jetbrains.buildServer.configs.kotlin.v10.toExtId
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.maven
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
+import jetbrains.buildServer.configs.kotlin.v2019_2.vcs.GitVcsRoot
 
 /*
 The settings script is an entry point for defining a TeamCity
@@ -49,12 +50,18 @@ project {
     }
 }
 
+object GitRepo: GitVcsRoot({
+    name = DslContext.getParameter("gitName")
+    branchSpec = DslContext.getParameter("gitBranchSpec","+:*")
+    url = DslContext.getParameter("gitUrl")
+})
+
 class Maven( name: String, goals: String, runnerArgs: String = "") : BuildType({
     id(name.toExtId())
     this.name = name
 
     vcs {
-        root(DslContext.settingsRoot)
+         root(GitRepo)
     }
 
     steps {
