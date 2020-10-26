@@ -30,6 +30,8 @@ version = "2020.1"
 
 project {
 
+    vcsRoot(GitRepo)
+
     val chain = sequential {
         buildType(Maven("Build", "clean compile"))
         parallel {
