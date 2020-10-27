@@ -32,16 +32,14 @@ project {
 
     vcsRoot(GitRepo)
 
-    val chain = sequential {
+    val bts = sequential {
         buildType(Maven("Build", "clean compile"))
         parallel {
             buildType(Maven("Fast Test", "clean test",  "-Dmaven.test.failure.ignore=true -Dtest=*.integration.*Test"))
             buildType(Maven("Slow Test", "clean test", "-Dmaven.test.failure.ignore=true -Dtest=*.unit.*Test"))
         }
         buildType(Maven("Package", "clean package", "-DskipTests"))
-    }
-
-    val bts = chain.buildTypes()
+    }.buildTypes();
 
     bts.forEach {buildType(it)}
     bts.last().triggers {
