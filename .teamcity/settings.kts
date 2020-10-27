@@ -40,14 +40,12 @@ project {
         }
         buildType(Maven("Package", "clean package", "-DskipTests"))
     }
-    chain.buildTypes().forEach {
-        run {
-            if (it == chain.buildTypes().last()) {
-                it.triggers {
-                    vcs {}
-                }
-            }
-            buildType(it)
+
+    val bts = chain.buildTypes()
+
+    bts.forEach {buildType(it)}
+    bts.last().triggers {
+        vcs {
         }
     }
 }
