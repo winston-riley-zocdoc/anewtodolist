@@ -35,7 +35,7 @@ project {
             buildType(Maven("Fast Test" , "clean test",  "-Dmaven.test.failure.ignore=true -Dtest=*.unit.*Test"))
             buildType(Maven("Slow Test" , "clean test",  "-Dmaven.test.failure.ignore=true -Dtest=*.integration.*Test"))
         }
-        buildType(Maven("Build" , "clean package", "-DskipTests"))
+        buildType(Maven("Package" , "clean package", "-DskipTests"))
     }.buildTypes()
 
     bt.forEach { buildType (it) }
