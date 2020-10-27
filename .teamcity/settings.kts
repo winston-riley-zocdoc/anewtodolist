@@ -58,7 +58,7 @@ object GitRepo: GitVcsRoot({
     url = DslContext.getParameter("gitUrl")
 })
 
-class Maven( name: String, goals: String, runnerArgs: String = "") : BuildType({
+class Maven( name: String, goals: String, runnerArgs: String? = null) : BuildType({
     id(name.toExtId())
     this.name = name
 
