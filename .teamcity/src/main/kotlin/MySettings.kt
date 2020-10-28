@@ -1,3 +1,4 @@
+import jetbrains.buildServer.configs.kotlin.v10.toExtId
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.Project
@@ -25,6 +26,7 @@ object MyProject: Project({
 })
 
 class Maven(name: String, goals: String, runnerArgs: String? = null, pom: String? = null): BuildType({
+    id(name.toExtId())
     this.name = name
 
     vcs {
