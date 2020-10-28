@@ -8,7 +8,9 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
 object MyProject: Project({
     val bts = sequential {
-        buildType(Maven(DslContext.getParameter("my-name"), "clean compile"))
+
+        buildType(Maven("Test DSL", "clean test", ".teamcity/pom.xml"))
+        buildType(Maven("Build", "clean compile"))
         parallel {
             buildType(Maven("Slow Test", "clean test", "-Dtest=*.integration.*Test"))
             buildType(Maven("Fast Test", "clean test", "-Dtest=*.unit.*Test"))
@@ -22,7 +24,7 @@ object MyProject: Project({
     }
 })
 
-class Maven(name: String, goals: String, runnerArgs: String? = null): BuildType({
+class Maven(name: String, goals: String, runnerArgs: String? = null, pom: String? = null): BuildType({
     this.name = name
 
     vcs {
@@ -31,8 +33,9 @@ class Maven(name: String, goals: String, runnerArgs: String? = null): BuildType(
 
     steps {
         maven {
-            this.goals = goals;
-            this.runnerArgs = runnerArgs;
+            this.pomLocation = pom
+            this.goals = goals
+            this.runnerArgs = runnerArgs
         }
     }
 })
