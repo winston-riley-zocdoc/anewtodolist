@@ -27,23 +27,25 @@ To debug in IntelliJ Idea, open the 'Maven Projects' tool window (View
 version = "2020.1"
 
 project {
-    buildType(Build)
-    buildType(SlowTest)
-    buildType(FastTest)
-    buildType(Package)
 
-    sequential {
-        buildType(Build)
+
+    val bts = sequential {
+        buildType(Maven("Build", "clean compile"))
         parallel {
-            buildType(SlowTest)
-            buildType(FastTest)
+            buildType(Maven("Slow Test", "clean test", "-Dtest=*.integration.*Test"))
+            buildType(Maven("Fast Test", "clean test", "-Dtest=*.unit.*Test"))
         }
-        buildType(Package)
+        buildType(Maven("Package", "clean package", "-DskipTests"))
+    }.buildTypes()
+
+    bts.forEach { buildType(it) }
+    bts.last().triggers {
+        vcs {}
     }
 }
 
-object Build : BuildType({
-    name = "Build"
+class Maven(name: String, goals: String, runnerArgs: String? = null): BuildType({
+    this.name = name
 
     vcs {
         root(DslContext.settingsRoot)
@@ -51,62 +53,9 @@ object Build : BuildType({
 
     steps {
         maven {
-            goals = "clean compile"
-            runnerArgs = "-Dmaven.test.failure.ignore=true"
+            this.goals = goals;
+            this.runnerArgs = runnerArgs;
         }
     }
 })
 
-object SlowTest : BuildType({
-    name = "Slow Test"
-
-    vcs {
-        root(DslContext.settingsRoot)
-    }
-
-    steps {
-        maven {
-            goals = "clean test"
-            runnerArgs = "-Dmaven.test.failure.ignore=true -Dtest=*.integration.*Test"
-        }
-    }
-})
-
-object FastTest : BuildType({
-    name = "Fast Test"
-
-    vcs {
-        root(DslContext.settingsRoot)
-    }
-
-    steps {
-        maven {
-            goals = "clean test"
-            runnerArgs = "-Dmaven.test.failure.ignore=true -Dtest=*.unit.*Test"
-        }
-    }
-})
-
-object Package : BuildType({
-    name = "Package"
-
-    vcs {
-        root(DslContext.settingsRoot)
-    }
-
-    steps {
-        maven {
-            goals = "clean package"
-            runnerArgs = "-Dmaven.test.failure.ignore=true -DskipTests"
-        }
-    }
-
-//    dependencies {
-//        snapshot(Build) {}
-//    }
-
-    triggers {
-        vcs {
-        }
-    }
-})
