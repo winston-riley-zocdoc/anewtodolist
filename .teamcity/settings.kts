@@ -26,36 +26,4 @@ To debug in IntelliJ Idea, open the 'Maven Projects' tool window (View
 
 version = "2020.1"
 
-project {
-
-
-    val bts = sequential {
-        buildType(Maven("Build", "clean compile"))
-        parallel {
-            buildType(Maven("Slow Test", "clean test", "-Dtest=*.integration.*Test"))
-            buildType(Maven("Fast Test", "clean test", "-Dtest=*.unit.*Test"))
-        }
-        buildType(Maven("Package", "clean package", "-DskipTests"))
-    }.buildTypes()
-
-    bts.forEach { buildType(it) }
-    bts.last().triggers {
-        vcs {}
-    }
-}
-
-class Maven(name: String, goals: String, runnerArgs: String? = null): BuildType({
-    this.name = name
-
-    vcs {
-        root(DslContext.settingsRoot)
-    }
-
-    steps {
-        maven {
-            this.goals = goals;
-            this.runnerArgs = runnerArgs;
-        }
-    }
-})
-
+project(Settings)
