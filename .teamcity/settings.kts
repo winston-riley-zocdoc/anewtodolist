@@ -28,45 +28,4 @@ To debug in IntelliJ Idea, open the 'Maven Projects' tool window (View
 
 version = "2020.1"
 
-project {
-
-    vcsRoot(MyGitVcsRoot)
-
-    val bts = sequential {
-        buildType(Maven("Build", "clean compile"))
-        parallel {
-            buildType(Maven("Fast Test", "clean test", "-Dmaven.test.failure.ignore=true -Dtest=*.unit.*Test"))
-            buildType(Maven("Slow Test", "clean test", "-Dmaven.test.failure.ignore=true -Dtest=*.integration.*Test"))
-        }
-        buildType(Maven("Package", "clean package", "-DskipTests"))
-    }.buildTypes()
-
-    bts.forEach { buildType(it) }
-    bts.last().triggers {
-        vcs {
-
-        }
-    }
-}
-
-object MyGitVcsRoot: GitVcsRoot({
-    name = DslContext.getParameter("gitVcsName")
-    url = DslContext.getParameter("gitVcsUrl")
-    branch = DslContext.getParameter("gitVcsBranch", "refs/heads/main")
-})
-
-class Maven(name: String, goals: String, runnerArgs: String? = null) : BuildType({
-    id(name.toExtId())
-    this.name = name
-
-    vcs {
-        root(MyGitVcsRoot)
-    }
-
-    steps {
-        maven {
-            this.goals = goals
-            this.runnerArgs = runnerArgs
-        }
-    }
-})
+project(MyProject)

@@ -22,7 +22,7 @@
     </repository>
     <repository>
       <id>teamcity-server</id>
-      <url>http://b993ff410b24.eu.ngrok.io/app/dsl-plugins-repository</url>
+      <url>http://localhost/app/dsl-plugins-repository</url>
       <snapshots>
         <enabled>true</enabled>
       </snapshots>
@@ -37,7 +37,8 @@
   </pluginRepositories>
 
   <build>
-    <sourceDirectory>${basedir}</sourceDirectory>
+    <sourceDirectory>${basedir}/src/main/kotlin</sourceDirectory>
+    <testSourceDirectory>${basedir}/src/test/kotlin</testSourceDirectory>
     <plugins>
       <plugin>
         <artifactId>kotlin-maven-plugin</artifactId>
@@ -71,10 +72,28 @@
           <dstDir>target/generated-configs</dstDir>
         </configuration>
       </plugin>
-    </plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.0.0-M5</version>
+      </plugin></plugins>
   </build>
 
   <dependencies>
+
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>5.7.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>3.18.0</version>
+    </dependency>
+
     <dependency>
       <groupId>org.jetbrains.teamcity</groupId>
       <artifactId>configs-dsl-kotlin</artifactId>
