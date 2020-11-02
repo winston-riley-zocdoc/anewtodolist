@@ -2,6 +2,7 @@ import jetbrains.buildServer.configs.kotlin.v10.toExtId
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.maven
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
+import jetbrains.buildServer.configs.kotlin.v2019_2.vcs.GitVcsRoot
 
 /*
 The settings script is an entry point for defining a TeamCity
@@ -29,6 +30,8 @@ version = "2020.1"
 
 project {
 
+    vcsRoot(MyGitVcsRoot)
+
     val bts = sequential {
         buildType(Maven("Build", "clean compile"))
         parallel {
@@ -44,12 +47,18 @@ project {
     }
 }
 
+object MyGitVcsRoot : GitVcsRoot({
+    name = DslContext.getParameter("gitVcsName")
+    url = DslContext.getParameter("gitVcsUrl")
+    branch = DslContext.getParameter("gitVcsBranch", "refs/heads/main")
+})
+
 class Maven(name: String, goals: String, runnerArgs: String? = null) : BuildType({
     id(name.toExtId())
     this.name = name
 
     vcs {
-        root(DslContext.settingsRoot)
+        root(MyGitVcsRoot)
     }
 
     steps {
