@@ -34,6 +34,10 @@ project {
 object Build : BuildType({
     name = "Build"
 
+    params {
+        param("vcs.branch.spec", "+:refs/heads/(fetti)")
+    }
+
     vcs {
         root(DslContext.settingsRoot)
     }
