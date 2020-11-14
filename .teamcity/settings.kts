@@ -1,8 +1,6 @@
-import jetbrains.buildServer.configs.kotlin.v10.toExtId
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.maven
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
-import jetbrains.buildServer.configs.kotlin.v2019_2.vcs.GitVcsRoot
 
 /*
 The settings script is an entry point for defining a TeamCity
@@ -30,43 +28,25 @@ version = "2020.1"
 
 project {
 
-    vcsRoot(MyVcsRoot)
-
-    val bts = sequential {
-        buildType(Maven("Build", "clean compile"))
-        parallel {
-            buildType(Maven("Fast Test", "clean test", "-Dmaven.test.failure.ignore=true -Dtest=*.unit.*Test"))
-            buildType(Maven("Slow Test", "clean test", "-Dmaven.test.failure.ignore=true -Dtest=*.integration.*Test"))
-        }
-        buildType(Maven("Package", "clean package", "-DskipTests"))
-    }.buildTypes()
-
-    bts.forEach { buildType(it) }
-    bts.last().triggers {
-        vcs {
-
-        }
-    }
+    buildType(Build)
 }
 
-object MyVcsRoot: GitVcsRoot({
-    name = DslContext.getParameter("vcsName")
-    url = DslContext.getParameter("vcsUrl")
-    branch = DslContext.getParameter("vcsBranch", "refs/heads/main")
-})
-
-class Maven(name: String, goals: String, runnerArgs: String? = null): BuildType({
-    id(name.toExtId())
-    this.name = name
+object Build : BuildType({
+    name = "Build"
 
     vcs {
-        root(MyVcsRoot)
+        root(DslContext.settingsRoot)
     }
 
     steps {
         maven {
-            this.goals = goals
-            this.runnerArgs = runnerArgs
+            goals = "clean test"
+            runnerArgs = "-Dmaven.test.failure.ignore=true"
+        }
+    }
+
+    triggers {
+        vcs {
         }
     }
 })
