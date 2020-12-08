@@ -1,19 +1,26 @@
 package com.jetbrains.teamcity.anewtodolist;
 
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.Charset;
 
 @Controller
 public class TodoListController {
+
+    private Logger logger = LoggerFactory.getLogger(TodoListController.class);
 
     private Integer latestBuild = null;
 
@@ -26,7 +33,7 @@ public class TodoListController {
     @RequestMapping(method =  {RequestMethod.POST, RequestMethod.PUT}, value = "approve/{latestBuildNumber}")
     @ResponseBody
     public String approve(@PathVariable  Integer latestBuildNumber) {
-        System.out.println("latestBuildNumber = " + latestBuildNumber);
+        logger.info("Latest Build Number =  {}", latestBuildNumber);
         this.latestBuild = latestBuildNumber;
         return "Success";
     }
@@ -36,7 +43,7 @@ public class TodoListController {
     @ResponseBody
     public String deploy() {
         final ResponseEntity<String> result = new RestTemplate().exchange("http://marco.teamcity/app/rest/builds/id:" + latestBuild + "/finish", HttpMethod.PUT,  new HttpEntity<>(createHeaders("marco", "marco")), String.class);
-        System.out.println(result.getBody());
+        logger.info("Request Body {}", result.getBody());
         latestBuild = null;
         return "Success";
     }
