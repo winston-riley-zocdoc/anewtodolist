@@ -3,6 +3,7 @@ package com.jetbrains.teamcity.anewtodolist;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -21,6 +22,9 @@ import java.nio.charset.Charset;
 public class TodoListController {
 
     private Logger logger = LoggerFactory.getLogger(TodoListController.class);
+
+    @Value("${teamcity.server.url}")
+    private String teamcityServerUrl;
 
     private Integer latestBuild = null;
 
@@ -42,7 +46,7 @@ public class TodoListController {
     @RequestMapping(method =  {RequestMethod.POST, RequestMethod.PUT}, value = "deploy")
     @ResponseBody
     public String deploy() {
-        final ResponseEntity<String> result = new RestTemplate().exchange("http://marco.teamcity/app/rest/builds/id:" + latestBuild + "/finish", HttpMethod.PUT,  new HttpEntity<>(createHeaders("marco", "marco")), String.class);
+        final ResponseEntity<String> result = new RestTemplate().exchange(teamcityServerUrl + "/app/rest/builds/id:" + latestBuild + "/finish", HttpMethod.PUT,  new HttpEntity<>(createHeaders("marco", "marco")), String.class);
         logger.info("Request Body {}", result.getBody());
         latestBuild = null;
         return "Success";
