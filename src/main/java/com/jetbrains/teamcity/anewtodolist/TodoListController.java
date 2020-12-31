@@ -26,6 +26,12 @@ public class TodoListController {
     @Value("${teamcity.server.url}")
     private String teamcityServerUrl;
 
+    @Value("${teamcity.user}")
+    private String teamcityUser;
+
+    @Value("${teamcity.password}")
+    private String teamcityToken;
+
     private Integer latestBuild = null;
 
     @RequestMapping(method =  { RequestMethod.GET}, value = "deploy")
@@ -46,7 +52,8 @@ public class TodoListController {
     @RequestMapping(method =  {RequestMethod.POST, RequestMethod.PUT}, value = "deploy")
     @ResponseBody
     public String deploy() {
-        final ResponseEntity<String> result = new RestTemplate().exchange(teamcityServerUrl + "/app/rest/builds/id:" + latestBuild + "/finish", HttpMethod.PUT,  new HttpEntity<>(createHeaders("marco", "marco")), String.class);
+        final ResponseEntity<String> result = new RestTemplate().exchange(teamcityServerUrl + "/app/rest/builds/id:" + latestBuild + "/finish",
+                HttpMethod.PUT,  new HttpEntity<>(createHeaders(teamcityUser, teamcityToken)), String.class);
         logger.info("Request Body {}", result.getBody());
         latestBuild = null;
         return "Success";
