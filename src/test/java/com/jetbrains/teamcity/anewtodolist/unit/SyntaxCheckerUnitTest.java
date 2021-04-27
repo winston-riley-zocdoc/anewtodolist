@@ -13,7 +13,7 @@ public class SyntaxCheckerUnitTest {
 
 
     @Test
-    public void fastTest() {
+    public void fastTest2() {
         assertEquals(2,2);
     }
 }
