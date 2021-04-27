@@ -16,4 +16,9 @@ public class SyntaxCheckerUnitTest {
     public void fastTest2() {
         assertEquals(2,2);
     }
+
+    @Test
+    public void fastTest3() {
+        assertEquals(3,3);
+    }
 }
