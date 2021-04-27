@@ -10,4 +10,10 @@ public class SyntaxCheckerUnitTest {
     public void fastTest() {
         assertEquals(1,1);
     }
+
+
+    @Test
+    public void fastTest() {
+        assertEquals(2,2);
+    }
 }
