@@ -8,7 +8,7 @@ public class SlowWebServiceTest {
 
     @Test
     public void slowTest() throws InterruptedException {
-        Thread.sleep(25000);
+        Thread.sleep(5000);
         assertEquals(1,1);
     }
 }
