@@ -30,23 +30,42 @@ version = "2021.2"
 
 project {
 
-    buildType(Build)
-    buildType(Package)
-    buildType(FastTest)
-    buildType(SlowTest)
-
-    sequential {
-        buildType(Build)
+    val buildSteps = sequential {
+        buildType(Maven("Build", "clean compile"))
         parallel {
-            buildType(FastTest)
-            buildType(SlowTest)
+            buildType(
+                Maven(
+                    "FastTests",
+                    "clean test",
+                    "-Dmaven.test.failure.ignore=true -Dtest=*.unit.*Test"
+                )
+            )
+            buildType(
+                Maven(
+                    "SlowTest",
+                    "clean test",
+                    "-Dmaven.test.failure.ignore=true -Dtest=*.integration.*Test"
+                )
+            )
         }
-        buildType(Package)
+        buildType(
+            Maven(
+                "Package",
+                "clean package",
+                "-Dmaven.test.failure.ignore=true -DskipTests"
+            )
+        )
+    }.buildTypes()
+
+    buildSteps.forEach {this.buildType(it)}
+
+    buildSteps.last().triggers {
+        vcs {}
     }
 }
 
-object Build : BuildType({
-    name = "Build"
+class Maven(name: String, goals: String, runnerArgs: String? = null) : BuildType({
+    this.name = name
 
     vcs {
         root(DslContext.settingsRoot)
@@ -54,105 +73,17 @@ object Build : BuildType({
 
     steps {
         maven {
-            goals = "clean compile"
-            runnerArgs = "-Dmaven.test.failure.ignore=true"
+            this.goals = goals
+            this.runnerArgs = runnerArgs
             jdkHome = "/Library/Java/JavaVirtualMachines/amazon-corretto-11.jdk/Contents/Home"
         }
     }
 
-    triggers {
-        vcs {
-        }
-    }
-
-    features {
-        freeDiskSpace {
-            requiredSpace = "6gb"
-            failBuild = true
-        }
-    }
-})
-
-object FastTest : BuildType({
-    name = "Fast Test"
-
-    vcs {
-        root(DslContext.settingsRoot)
-    }
-
-    steps {
-        maven {
-            goals = "clean test"
-            runnerArgs = "-Dmaven.test.failure.ignore=true -Dtest=*.unit.*Test"
-            jdkHome = "/Library/Java/JavaVirtualMachines/amazon-corretto-11.jdk/Contents/Home"
-        }
-    }
-
-    triggers {
-        vcs {
-        }
-    }
-
-    features {
-        freeDiskSpace {
-            requiredSpace = "6gb"
-            failBuild = true
-        }
-    }
-})
-
-object SlowTest : BuildType({
-    name = "Slow Test"
-
-    vcs {
-        root(DslContext.settingsRoot)
-    }
-
-    steps {
-        maven {
-            goals = "clean test"
-            runnerArgs = "-Dmaven.test.failure.ignore=true -Dtest=*.integration.*Test"
-            jdkHome = "/Library/Java/JavaVirtualMachines/amazon-corretto-11.jdk/Contents/Home"
-        }
-    }
-
-    triggers {
-        vcs {
-        }
-    }
-
-    features {
-        freeDiskSpace {
-            requiredSpace = "6gb"
-            failBuild = true
-        }
-    }
-})
-
-object Package : BuildType({
-    name = "Package"
-
-    vcs {
-        root(DslContext.settingsRoot)
-    }
-
-    steps {
-        maven {
-            goals = "clean package"
-            runnerArgs = "-Dmaven.test.failure.ignore=true -DskipTests"
-            jdkHome = "/Library/Java/JavaVirtualMachines/amazon-corretto-11.jdk/Contents/Home"
-        }
-    }
-
-//    dependencies {
-//        snapshot(Build) {}
+//    triggers {
+//        vcs {
+//        }
 //    }
 
-    triggers {
-        vcs {
-        }
-    }
-
     features {
         freeDiskSpace {
             requiredSpace = "6gb"
@@ -160,3 +91,119 @@ object Package : BuildType({
         }
     }
 })
+
+//object Build : BuildType({
+//    name = "Build"
+//
+//    vcs {
+//        root(DslContext.settingsRoot)
+//    }
+//
+//    steps {
+//        maven {
+//            goals = "clean compile"
+//            runnerArgs = "-Dmaven.test.failure.ignore=true"
+//            jdkHome = "/Library/Java/JavaVirtualMachines/amazon-corretto-11.jdk/Contents/Home"
+//        }
+//    }
+//
+//    triggers {
+//        vcs {
+//        }
+//    }
+//
+//    features {
+//        freeDiskSpace {
+//            requiredSpace = "6gb"
+//            failBuild = true
+//        }
+//    }
+//})
+
+//object FastTest : BuildType({
+//    name = "Fast Test"
+//
+//    vcs {
+//        root(DslContext.settingsRoot)
+//    }
+//
+//    steps {
+//        maven {
+//            goals = "clean test"
+//            runnerArgs = "-Dmaven.test.failure.ignore=true -Dtest=*.unit.*Test"
+//            jdkHome = "/Library/Java/JavaVirtualMachines/amazon-corretto-11.jdk/Contents/Home"
+//        }
+//    }
+//
+//    triggers {
+//        vcs {
+//        }
+//    }
+//
+//    features {
+//        freeDiskSpace {
+//            requiredSpace = "6gb"
+//            failBuild = true
+//        }
+//    }
+//})
+
+//object SlowTest : BuildType({
+//    name = "Slow Test"
+//
+//    vcs {
+//        root(DslContext.settingsRoot)
+//    }
+//
+//    steps {
+//        maven {
+//            goals = "clean test"
+//            runnerArgs = "-Dmaven.test.failure.ignore=true -Dtest=*.integration.*Test"
+//            jdkHome = "/Library/Java/JavaVirtualMachines/amazon-corretto-11.jdk/Contents/Home"
+//        }
+//    }
+//
+//    triggers {
+//        vcs {
+//        }
+//    }
+//
+//    features {
+//        freeDiskSpace {
+//            requiredSpace = "6gb"
+//            failBuild = true
+//        }
+//    }
+//})
+
+//object Package : BuildType({
+//    name = "Package"
+//
+//    vcs {
+//        root(DslContext.settingsRoot)
+//    }
+//
+//    steps {
+//        maven {
+//            goals = "clean package"
+//            runnerArgs = "-Dmaven.test.failure.ignore=true -DskipTests"
+//            jdkHome = "/Library/Java/JavaVirtualMachines/amazon-corretto-11.jdk/Contents/Home"
+//        }
+//    }
+//
+////    dependencies {
+////        snapshot(Build) {}
+////    }
+//
+//    triggers {
+//        vcs {
+//        }
+//    }
+//
+//    features {
+//        freeDiskSpace {
+//            requiredSpace = "6gb"
+//            failBuild = true
+//        }
+//    }
+//})
