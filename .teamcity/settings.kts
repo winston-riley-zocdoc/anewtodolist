@@ -31,6 +31,12 @@ version = "2021.2"
 project {
 
     buildType(Build)
+    buildType(Package)
+
+    sequential {
+        buildType(Build)
+        buildType(Package)
+    }
 }
 
 object Build : BuildType({
@@ -42,11 +48,44 @@ object Build : BuildType({
 
     steps {
         maven {
-            goals = "clean package"
+            goals = "clean compile"
             runnerArgs = "-Dmaven.test.failure.ignore=true"
             jdkHome = "/Library/Java/JavaVirtualMachines/amazon-corretto-11.jdk/Contents/Home"
         }
     }
+
+    triggers {
+        vcs {
+        }
+    }
+
+    features {
+        freeDiskSpace {
+            requiredSpace = "6gb"
+            failBuild = true
+        }
+    }
+})
+
+
+object Package : BuildType({
+    name = "Package"
+
+    vcs {
+        root(DslContext.settingsRoot)
+    }
+
+    steps {
+        maven {
+            goals = "clean package"
+            runnerArgs = "-Dmaven.test.failure.ignore=true -DskipTests"
+            jdkHome = "/Library/Java/JavaVirtualMachines/amazon-corretto-11.jdk/Contents/Home"
+        }
+    }
+
+//    dependencies {
+//        snapshot(Build) {}
+//    }
 
     triggers {
         vcs {
