@@ -32,9 +32,15 @@ project {
 
     buildType(Build)
     buildType(Package)
+    buildType(FastTest)
+    buildType(SlowTest)
 
     sequential {
         buildType(Build)
+        parallel {
+            buildType(FastTest)
+            buildType(SlowTest)
+        }
         buildType(Package)
     }
 }
@@ -67,6 +73,61 @@ object Build : BuildType({
     }
 })
 
+object FastTest : BuildType({
+    name = "Fast Test"
+
+    vcs {
+        root(DslContext.settingsRoot)
+    }
+
+    steps {
+        maven {
+            goals = "clean test"
+            runnerArgs = "-Dmaven.test.failure.ignore=true -Dtest=*.unit.*Test"
+            jdkHome = "/Library/Java/JavaVirtualMachines/amazon-corretto-11.jdk/Contents/Home"
+        }
+    }
+
+    triggers {
+        vcs {
+        }
+    }
+
+    features {
+        freeDiskSpace {
+            requiredSpace = "6gb"
+            failBuild = true
+        }
+    }
+})
+
+object SlowTest : BuildType({
+    name = "Slow Test"
+
+    vcs {
+        root(DslContext.settingsRoot)
+    }
+
+    steps {
+        maven {
+            goals = "clean test"
+            runnerArgs = "-Dmaven.test.failure.ignore=true -Dtest=*.integration.*Test"
+            jdkHome = "/Library/Java/JavaVirtualMachines/amazon-corretto-11.jdk/Contents/Home"
+        }
+    }
+
+    triggers {
+        vcs {
+        }
+    }
+
+    features {
+        freeDiskSpace {
+            requiredSpace = "6gb"
+            failBuild = true
+        }
+    }
+})
 
 object Package : BuildType({
     name = "Package"
