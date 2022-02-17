@@ -32,23 +32,28 @@ version = "2021.2"
 project {
 
     val buildSteps = sequential {
+        // build
         buildType(Maven("Build", "clean compile"))
+
+        // test
         parallel {
             buildType(
                 Maven(
-                    "FastTests",
+                    "Fast Tests",
                     "clean test",
                     "-Dmaven.test.failure.ignore=true -Dtest=*.unit.*Test"
                 )
             )
             buildType(
                 Maven(
-                    "SlowTest",
+                    "Slow Test",
                     "clean test",
                     "-Dmaven.test.failure.ignore=true -Dtest=*.integration.*Test"
                 )
             )
         }
+
+        // package
         buildType(
             Maven(
                 "Package",
