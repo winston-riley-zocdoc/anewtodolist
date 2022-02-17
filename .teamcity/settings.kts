@@ -41,13 +41,9 @@ object Build : BuildType({
 
     steps {
         maven {
-            goals = "clean test"
+            goals = "clean package"
             runnerArgs = "-Dmaven.test.failure.ignore=true"
             jdkHome = "/Library/Java/JavaVirtualMachines/amazon-corretto-11.jdk/Contents/Home"
-        }
-        script {
-            enabled = false
-            scriptContent = "call mvnw.cmd"
         }
     }
 
